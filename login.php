@@ -1,21 +1,25 @@
 <?php
+include 'db.php';
 
 $email = $_POST['email'];
 $password = $_POST['password'];
+    session_start();
+$sql= "SELECT *FROM users WHERE email = '$email'";
+$result = mysqli_query($conn,$sql);
+$user = mysqli_fetch_assoc($result);
 
-$users = file("users.txt");
+if(
+    $user  &&
+    password_verify($password ,$user['password']  )
+){
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['name'] = $user['name'];
+$_SESSION['email'] = $user['email'];
+    header("Location:index.html");
+    exit();
 
-foreach($users as $user){
-    $data = explode("|" , trim($user));
-    if(
-        $data[1] == $email
-        &&
-        $data[2] == $password
-    ){
-        header("LOcation: index.html");
-        exit();
-    }
+}else{
+         echo "Invalid Email or Password";
 }
-echo "Invalid Login"
 
 ?>

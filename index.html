@@ -133,7 +133,9 @@
                         <hr>
                         <h4> <span class="circle"> DM</span>1st Donor </h4>
                         <h5>Dr M <br>₹9,999 </h5>
-                        <button class="donate" id="donate-btn">
+                        <button class="donate" id="donate-btn" 
+                           data-campaign-id="1">    
+                        
                             <h2>DONATE NOW</h2>
                             <span>(Indian tax benefits available)</span>
                         </button>
@@ -146,37 +148,56 @@
         </div>
     </div>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<script>
+    <script>
 
-const donateBtn = document.getElementById("donate-btn");
-donateBtn.addEventListener("click",function(){
-    try{
-       const option = {
-        key:"rzp_test_T1rz0y7p7Cggag",
-        amount:5000,
-        currency:"INR",
-        name:"ImpactGuru Donar",
-        description : "Donation Test",
+        const donateBtn = document.getElementById("donate-btn");
+        const campaignId =
+          donateBtn.dataset.campaignId;
+        donateBtn.addEventListener("click", function () {
+            try {
+                const option = {
+                    key: "rzp_test_T1rz0y7p7Cggag",
+                    amount: 5000,
+                    currency: "INR",
+                    name: "ImpactGuru Donar",
+                    description: "Donation Test",
 
-        handler: function (response){
-           window.location.href = "success.html";
-        },
-        modal: {
-            ondismiss:function (){
-                console.log("Razorpay popup closed");
+                    handler: function (response) {
+
+                        fetch("save_donation.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                payment_id: response.razorpay_payment_id,
+                                amount: 500,
+                                campaign_id: campaignId,
+                            })
+                        })
+                            .then(res => res.text())
+                            .then(data => console.log(data));
+                              window.location.href =
+                            `success.php?amount=500&payment_id=${response.razorpay_payment_id}&campaign_id=${campaignId}`;
+
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            console.log("Razorpay popup closed");
+                        }
+                    }   
+                }
+                const rzp = new Razorpay(option);
+                rzp.open();
+            } catch (error) {
+                console.error("Error Occured");
             }
-        }
-    }
-    const rzp= new Razorpay(option);
-    rzp.open();
-    }catch(error){
-        console.error("Error Occured");
-    }
-});
+        });    
+        
 
-</script>
+    </script>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>

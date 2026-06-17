@@ -1,18 +1,21 @@
 <?php
-
+ include 'db.php';
 $name = $_POST['name'];
 $email = $_POST['email'];
-$password = $_POST['password'];
-
-$data = $name . "|" . $email . "|" . $password . "\n";
-
-file_put_contents(
-    "users.txt",
-    $data,
-    FILE_APPEND
+$password = password_hash(
+    $_POST['password'],
+    PASSWORD_DEFAULT
 );
 
-header("Location: index.html");
-exit();
+$sql =  "INSERT INTO users(name,email,password)
+        VALUES('$name','$email','$password')";
+
+if(mysqli_query($conn,$sql)){
+    
+    header("Location: index.html");
+    exit();
+}else{
+     echo "Signup Failed";
+}
 
 ?>
